@@ -1,0 +1,13 @@
+{
+    chords: {
+        "skey":    "secret_key",
+        "host":    "chords_host.com",
+        "enabled": true
+    },
+    tpg: {
+        "serial_dev":    "/dev/cu.usbserial",
+        "baud":          115200,
+        "auto_time":     "00:00:00",
+        "auto_interval": "00:00:15"
+    }
+}
