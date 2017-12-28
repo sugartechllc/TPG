@@ -18,7 +18,7 @@ a default set of values, but these may be overriden by values in the tpg.py conf
 
 
 TPG readings are obtained by sending commands to the gauge, and parsing the returned output.
-The two key commands are `MEAS` (perform a measurement) and `TIME` (return the system time.
+The two key commands are `MEAS` (perform a measurement) and `TIME` (return the system time).
 
 Example output from `MEAS`:
 ```
