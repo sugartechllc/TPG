@@ -2,7 +2,8 @@
     "chords": {
         "skey":    "secret_key",
         "host":    "chords_host.com",
-        "enabled": true
+        "enabled": true,
+        "test":    false
     },
     "tpg": {
         "serial_dev":    "/dev/cu.usbserial",
