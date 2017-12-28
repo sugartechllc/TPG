@@ -33,6 +33,7 @@ Reading
 Temp In Box 21.62 C
 
 >
+```
 
 Example output from `TIME`:
 ```
