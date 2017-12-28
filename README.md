@@ -41,3 +41,12 @@ TIME
 System time 2017/12/28 22:45:33
 ```
 
+Example output from `BATT`:
+```
+BATT
+Battery 11.8V
+
+
+>
+```
+
