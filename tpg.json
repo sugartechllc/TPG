@@ -8,7 +8,9 @@
     "tpg": {
         "serial_dev":    "/dev/cu.usbserial",
         "baud":          115200,
+        "station_name":  "Site 1",
         "auto_time":     "00:00:00",
-        "auto_interval": "00:00:15"
+        "auto_interval": "00:00:15",
+        "avg_time":      "1.0"
     }
 }
