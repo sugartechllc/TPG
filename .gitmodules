@@ -2,3 +2,7 @@
 	path = py-chords
 	url = https://github.com/sugartechllc/py-chords.git
 	branch = master
+[submodule "pychords"]
+	path = pychords
+	url = https://github.com/sugartechllc/pychords.git
+	branch = master
