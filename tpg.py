@@ -33,7 +33,6 @@ class TPG(object):
             print("write <" + data +">")
         self.ser.write((data+'\r').encode('UTF-8'))
         self.ser.flush()
-        #sleep(1)
 
     def config(self):
         """
