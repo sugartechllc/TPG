@@ -4,7 +4,6 @@
 
 import sys
 import argparse
-from time import sleep
 import serial
 
 verbose = False
