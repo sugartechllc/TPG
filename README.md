@@ -1,5 +1,5 @@
 # Total Precipitation Gauge
-
+## Overview
 A python module for interacting with the Sutron Total Precipitation Gauge (TPG).
 
 The TPG onboard logger is configured and controlled by commands sent via the RS-232 port.
@@ -20,7 +20,21 @@ a default set of values, but these may be overriden by values in the tpg.py conf
 TPG readings are obtained by sending commands to the gauge, and parsing the returned output.
 The two key commands are `MEAS` (perform a measurement) and `TIME` (return the system time).
 
-Example output from `MEAS`:
+## RS-232 Interaction
+The TPG prompts with `>` after any command. The typical interaction will be to send
+a command, and read back lines until one containing just `>` is received.
+
+Since the line with the prompt does not have a line terminator, the readline() will be issued with 
+a timeout, so that the prompt line can be detected.
+
+The text returned from the TPG is 'pretty formatted', and tpg.py has to dig through all of it
+to extract the desired values. This is not really too hard; the approach will be to create a list 
+of tokens, search for matching tupples such as `("Precip", "0.0018")` or 
+`("System", "time", "2017/12/28", "22:45:33")`, and capture the desired readings.
+
+## TPG Commands
+These are the TPG commands used by tpg.py, and the associated output.
+
 ```
 MEAS 
 Reading
@@ -35,13 +49,11 @@ Temp In Box 21.62 C
 >
 ```
 
-Example output from `TIME`:
 ```
 TIME
 System time 2017/12/28 22:45:33
 ```
 
-Example output from `BATT`:
 ```
 BATT
 Battery 11.8V
