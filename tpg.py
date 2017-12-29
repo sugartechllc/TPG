@@ -115,7 +115,7 @@ class TPG(object):
 
         batt = lines[1].split(' ')
         if len(batt) == 2:
-            retval["batt"] = batt[1]
+            retval["batt"] = batt[1].replace('V','')
 
         return retval
 
