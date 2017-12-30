@@ -6,7 +6,7 @@
         "test":    false
     },
     "tpg": {
-        "serial_dev":    "/dev/cu.usbserial",
+        "device":        "/dev/cu.usbserial",
         "baud":          115200,
         "station_name":  "Site 1",
         "auto_time":     "00:00:00",

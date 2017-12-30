@@ -1,4 +1,8 @@
 #! /usr/local/bin/python3
+"""
+TPG abstraction
+"""
+
 # pylint: disable=C0103
 # pylint: disable=C0325
 
