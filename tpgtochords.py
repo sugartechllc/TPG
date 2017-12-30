@@ -7,7 +7,7 @@ import tpg
 import pychords.tochords as tochords
 
 def timestamp():
-    t = time.localtime()
+    t = time.gmtime()
     ts = "{:04}-{:02}-{:02} {:02}:{:02}:{:02}".format(t[0], t[1], t[2], t[3], t[4], t[5])
     return ts
  
