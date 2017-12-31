@@ -101,4 +101,8 @@ if __name__ == '__main__':
         uri = tochords.buildURI(host, chords_record)
         # Send it to chords
         tochords.submitURI(uri, 720)
+        # Flush the outputs
+        sys.stdout.flush()
+        sys.stderr.flush() 
+        # Sleep until the next measurement time
         time.sleep(sleep_secs)
