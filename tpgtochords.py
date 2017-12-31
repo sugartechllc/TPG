@@ -86,15 +86,12 @@ if __name__ == '__main__':
     while True:
         # get a reading from the tpg
         tpg_data = tpg.reading()
-        print(tpg_data)
-        # rename keys to match what we will send to chords
+        # Make a chords variable dict to send to chords
         chords_record = make_chords_vars(tpg_data, new_keys)
         # Merge in the chords options
         chords_record.update(chords_options)
-        print(chords_record)
         # create the chords uri
         uri = tochords.buildURI(host, chords_record)
-        print(uri)
+        # Send it to chords
         tochords.submitURI(uri, 720)
-        print(timestamp(), "Queue length: {:05}".format(tochords.waiting()))
         time.sleep(10)
