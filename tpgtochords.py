@@ -36,7 +36,8 @@ if __name__ == '__main__':
             "host":    "chords_host.com",
             "enabled": true,
             "inst_id": "1",
-            "test":    true
+            "test":    true,
+            "sleep_secs": 5
         },
         "tpg": {
             "device":        "/dev/cu.usbserial",
@@ -74,6 +75,10 @@ if __name__ == '__main__':
         "test": config["chords"]["test"],
         "skey": config["chords"]["skey"]
     }
+    if "sleep_secs" in config["chords"]:
+        sleep_secs = config["chords"]["sleep_secs"]
+    else:
+        sleep_secs = 5
 
     # Start the CHORDS sender thread
     tochords.startSender()
@@ -94,4 +99,4 @@ if __name__ == '__main__':
         uri = tochords.buildURI(host, chords_record)
         # Send it to chords
         tochords.submitURI(uri, 720)
-        time.sleep(10)
+        time.sleep(sleep_secs)
