@@ -6,6 +6,8 @@ After=network.target
 [Service]
 User=pi
 Restart=always
+RestartSec=1
+StartLimitIntervalSec=0
 Type=simple
 WorkingDirectory=/home/pi/tpg
 ExecStart=/usr/bin/python3 /home/pi/tpg/tpgtochords.py /home/pi/tpg/tpg-mtnking.json
