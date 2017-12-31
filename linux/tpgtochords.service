@@ -1,0 +1,14 @@
+
+[Unit]
+Description=TPG to CHORDS Service
+After=network.target
+
+[Service]
+User=pi
+Restart=always
+Type=simple
+WorkingDirectory=/home/pi/tpg
+ExecStart=/usr/bin/python3 /home/pi/tpgtochords.py /home/pi/tpg/tpg-mtnking.json
+
+[Install]
+WantedBy=multi-user.target
