@@ -1,10 +1,26 @@
 #! /usr/local/bin/python3
 
 import time
+import sys
 import json
 
 import tpg
 import pychords.tochords as tochords
+
+def make_chords_vars(old_hash, new_keys):
+    """
+    Rename the keys in a hash. If an old key does not 
+    exist in the new_keys, remove it.
+    """
+    new_hash = {}
+    for old_key, old_val in old_hash.items():
+        if old_key in new_keys:
+            new_hash[new_keys[old_key]] = old_val
+
+    # The chords library wants the vars in a separate dict
+    new_hash = { "vars": new_hash}
+    return new_hash
+
 
 def timestamp():
     t = time.gmtime()
@@ -13,13 +29,14 @@ def timestamp():
  
 if __name__ == '__main__':
 
-    config_json = """
+    test_config = """
     {
         "chords": {
             "skey":    "secret_key",
             "host":    "chords_host.com",
             "enabled": true,
-            "test":    false
+            "inst_id": "1",
+            "test":    true
         },
         "tpg": {
             "device":        "/dev/cu.usbserial",
@@ -32,7 +49,31 @@ if __name__ == '__main__':
     }
     """
 
-    config = json.loads(config_json)
+    new_keys = {
+        'time': 'at',
+        'precip': 'precip',
+        'bucket': 'bucket',
+        'rate': 'rate', 
+        'temperature': 'temp', 
+        'batt': 'battv'
+    }
+
+    if len(sys.argv) > 2:
+        print ("Usage:", sys.argv[0], "[config_file]")
+        sys.exit(1)
+
+    if len(sys.argv) == 1:
+        config = json.loads(test_config)
+    else:
+        config = json.loads(open(sys.argv[1]).read())
+
+    # Extract some useful config values
+    host = config["chords"]["host"]
+    chords_options = {
+        "inst_id": config["chords"]["inst_id"],
+        "test": config["chords"]["test"],
+        "skey": config["chords"]["skey"]
+    }
 
     # Start the CHORDS sender thread
     tochords.startSender()
@@ -43,6 +84,17 @@ if __name__ == '__main__':
         tpg = tpg.TPG(device=config["tpg"]["device"])        
 
     while True:
-        print (tpg.reading())
+        # get a reading from the tpg
+        tpg_data = tpg.reading()
+        print(tpg_data)
+        # rename keys to match what we will send to chords
+        chords_record = make_chords_vars(tpg_data, new_keys)
+        # Merge in the chords options
+        chords_record.update(chords_options)
+        print(chords_record)
+        # create the chords uri
+        uri = tochords.buildURI(host, chords_record)
+        print(uri)
+        tochords.submitURI(uri, 720)
         print(timestamp(), "Queue length: {:05}".format(tochords.waiting()))
-        time.sleep(1)
+        time.sleep(10)
