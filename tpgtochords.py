@@ -4,8 +4,17 @@ import time
 import sys
 import json
 
+from ina219 import INA219
+from ina219 import DeviceRangeError
 import tpg
 import pychords.tochords as tochords
+
+SHUNT_OHMS = 0.1
+MAX_EXPECTED_AMPS = 0.2
+
+# Create and configure the ina219 device
+ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
+ina.configure(ina.RANGE_16V)
 
 def make_chords_vars(old_hash, new_keys):
     """
@@ -23,9 +32,27 @@ def make_chords_vars(old_hash, new_keys):
 
 
 def timestamp():
+    """
+    Return an ISO formated current timestamp
+    """
     t = time.gmtime()
-    ts = "{:04}-{:02}-{:02} {:02}:{:02}:{:02}".format(t[0], t[1], t[2], t[3], t[4], t[5])
+    ts = "{:04}-{:02}-{:02}T{:02}:{:02}:{:02}Z".format(t[0], t[1], t[2], t[3], t[4], t[5])
     return ts
+
+def read_ina():
+    """
+    Read and return a hash of ina219 values
+    """
+    retval = {}
+    retval["busv_V"] = "{:.2f}".format(ina.voltage())
+    try:
+        retval["i_mA"]   = "{:.2f}".format(ina.current())
+        retval["pwr_mW"] = "{:.2f}".format(ina.power())
+        retval["v_mV"]   = "{:.2f}".format(ina.shunt_voltage())
+    except DeviceRangeError as e:
+        # Current out of device range with specified shunt resister
+        print (e)
+    return retval
  
 if __name__ == '__main__':
 
@@ -91,10 +118,14 @@ if __name__ == '__main__':
         tpg = tpg.TPG(device=config["tpg"]["device"])        
 
     while True:
+        # Read the ina219.
+        ina_vars = read_ina()
         # get a reading from the tpg
         tpg_data = tpg.reading()
         # Make a chords variable dict to send to chords
         chords_record = make_chords_vars(tpg_data, new_keys)
+        # Add in the ina variables
+        chords_record["vars"].update(ina_vars)
         # Merge in the chords options
         chords_record.update(chords_options)
         # create the chords uri
