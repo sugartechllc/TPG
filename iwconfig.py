@@ -1,17 +1,20 @@
+"""
+Access iwconfig command.
+"""
 import os
 import re
 
-def iwconfig(teststring = None):
+def iwconfig(teststring=None):
     """
     Run iwconfig and return the wifi characteristics as a hash.
 
     iwconfig returns outout in this form:
-    wlan0     IEEE 802.11  ESSID:"Kitchen"  
-          Mode:Managed  Frequency:2.417 GHz  Access Point: 28:C6:8E:76:5B:70   
-          Bit Rate=5.5 Mb/s   Tx-Power=31 dBm   
+    wlan0     IEEE 802.11  ESSID:"Kitchen"
+          Mode:Managed  Frequency:2.417 GHz  Access Point: 28:C6:8E:76:5B:70
+          Bit Rate=5.5 Mb/s   Tx-Power=31 dBm
           Retry short limit:7   RTS thr:off   Fragment thr:off
           Power Management:on
-          Link Quality=31/70  Signal level=-79 dBm  
+          Link Quality=31/70  Signal level=-79 dBm
           Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
           Tx excessive retries:451  Invalid misc:0   Missed beacon:0
 
@@ -23,7 +26,7 @@ def iwconfig(teststring = None):
         lines = teststring
     else:
         p = os.popen('/sbin/iwconfig', 'r')
-        lines = cmd_out = p.read()
+        lines = p.read()
 
     lines = lines.split("\n")
     retval = {}
@@ -40,7 +43,7 @@ def iwconfig(teststring = None):
     # Find "ESSID" followed by a value
     try:
         i1 = tokens.index("ESSID")
-        if (len(tokens) > i1):
+        if len(tokens) > i1:
             retval["ssid"] = tokens[i1+1].strip('"')
     except ValueError:
         # not found
@@ -60,7 +63,7 @@ def iwconfig(teststring = None):
 
 if __name__ == '__main__':
 
-    teststring = """
+    test = """
     wlan0     IEEE 802.11  ESSID:"Kitchen"  
           Mode:Managed  Frequency:2.417 GHz  Access Point: 28:C6:8E:76:5B:70   
           Bit Rate=5.5 Mb/s   Tx-Power=31 dBm   
@@ -73,4 +76,4 @@ if __name__ == '__main__':
     lo        no wireless extensions.
     """
 
-    print(iwconfig(teststring))
+    print(iwconfig(test))
