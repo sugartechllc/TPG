@@ -119,19 +119,13 @@ if __name__ == '__main__':
 
     while True:
         # Read the ina219.
-        chords_record = {}
-        vars = read_ina()
-        vars["at"] = timestamp()
-        chords_record["vars"] = vars
-        chords_record.update(chords_options)
-        print(chords_record)
-        uri = tochords.buildURI(host, chords_record)
-        tochords.submitURI(uri, 720)
-
+        ina_vars = read_ina()
         # get a reading from the tpg
         tpg_data = tpg.reading()
         # Make a chords variable dict to send to chords
         chords_record = make_chords_vars(tpg_data, new_keys)
+        # Add in the ina variables
+        chords_record["vars"].update(ina_vars)
         # Merge in the chords options
         chords_record.update(chords_options)
         # create the chords uri
