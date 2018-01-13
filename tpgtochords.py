@@ -103,7 +103,7 @@ def get_bme280():
     CHORDS shortnames.
     """
     bme = bme280.reading()
-    bme['tpg_temp_mb'] = bme.pop('press_mb')
+    bme['tpg_pres_mb'] = bme.pop('pres_mb')
     bme['tpg_temp_c'] = bme.pop('temp_C')
     bme['tpg_rh'] = bme.pop('rh')
     return bme
