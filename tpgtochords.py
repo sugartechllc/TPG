@@ -1,4 +1,9 @@
 #! /usr/local/bin/python3
+"""
+Read tpg sensors (ina219, bme280 and tpg), and send to CHORDS.
+"""
+
+# pylint: disable=C0103
 
 import time
 import sys
@@ -6,9 +11,10 @@ import json
 
 from ina219 import INA219
 from ina219 import DeviceRangeError
+import bme280
 import tpg
-import pychords.tochords as tochords
 import iwconfig
+import pychords.tochords as tochords
 
 SHUNT_OHMS = 0.1
 MAX_EXPECTED_AMPS = 0.2
@@ -17,18 +23,43 @@ MAX_EXPECTED_AMPS = 0.2
 ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
 ina.configure(ina.RANGE_16V)
 
-def make_chords_vars(old_hash, new_keys):
+# Create the BME280 device
+bme280 = bme280.bme280()
+
+# A test config to be used in the absence of a configuration file
+test_config = """
+{
+    "chords": {
+        "skey":    "secret_key",
+        "host":    "chords_host.com",
+        "enabled": true,
+        "inst_id": "1",
+        "test":    true,
+        "sleep_secs": 5
+    },
+    "tpg": {
+        "device":        "/dev/cu.usbserial",
+        "baud":          115200,
+        "station_name":  "Site 1",
+        "auto_time":     "00:00:00",
+        "auto_interval": "00:00:15",
+        "avg_time":      "1.0"
+    }
+}
+"""
+
+def make_chords_vars(old_hash, replace_keys):
     """
-    Rename the keys in a hash. If an old key does not 
+    Rename the keys in a hash. If an old key does not
     exist in the new_keys, remove it.
     """
     new_hash = {}
     for old_key, old_val in old_hash.items():
-        if old_key in new_keys:
-            new_hash[new_keys[old_key]] = old_val
+        if old_key in replace_keys:
+            new_hash[replace_keys[old_key]] = old_val
 
     # The chords library wants the vars in a separate dict
-    new_hash = { "vars": new_hash}
+    new_hash = {"vars": new_hash}
     return new_hash
 
 
@@ -47,12 +78,12 @@ def read_ina():
     retval = {}
     retval["busv_V"] = "{:.2f}".format(ina.voltage())
     try:
-        retval["i_mA"]   = "{:.2f}".format(ina.current())
+        retval["i_mA"] = "{:.2f}".format(ina.current())
         retval["pwr_mW"] = "{:.2f}".format(ina.power())
-        retval["v_mV"]   = "{:.2f}".format(ina.shunt_voltage())
+        retval["v_mV"] = "{:.2f}".format(ina.shunt_voltage())
     except DeviceRangeError as e:
         # Current out of device range with specified shunt resister
-        print (e)
+        print(e)
     return retval
 
 def get_iw():
@@ -66,42 +97,33 @@ def get_iw():
         iwvars["sig_dbm"] = iw["sig_dbm"]
     return iwvars
 
+def get_bme280():
+    """
+    Get a bme280 reading. Translate hash names into
+    CHORDS shortnames.
+    """
+    bme = bme280.reading()
+    bme['tpg_temp_mb'] = bme.pop('press_mb')
+    bme['tpg_temp_c'] = bme.pop('temp_C')
+    bme['tpg_rh'] = bme.pop('rh')
+    return bme
+
 if __name__ == '__main__':
 
-    test_config = """
-    {
-        "chords": {
-            "skey":    "secret_key",
-            "host":    "chords_host.com",
-            "enabled": true,
-            "inst_id": "1",
-            "test":    true,
-            "sleep_secs": 5
-        },
-        "tpg": {
-            "device":        "/dev/cu.usbserial",
-            "baud":          115200,
-            "station_name":  "Site 1",
-            "auto_time":     "00:00:00",
-            "auto_interval": "00:00:15",
-            "avg_time":      "1.0"
-        }
-    }
-    """
 
     new_keys = {
         'time': 'at',
         'precip': 'precip',
         'bucket': 'bucket',
-        'rate': 'rate', 
-        'temperature': 'temp', 
+        'rate': 'rate',
+        'temperature': 'temp',
         'batt': 'battv'
     }
 
     print("Starting", sys.argv)
 
     if len(sys.argv) > 2:
-        print ("Usage:", sys.argv[0], "[config_file]")
+        print("Usage:", sys.argv[0], "[config_file]")
         sys.exit(1)
 
     if len(sys.argv) == 1:
@@ -127,22 +149,26 @@ if __name__ == '__main__':
     if "baud" in config["tpg"]:
         tpg = tpg.TPG(device=config["tpg"]["device"], baud=config["tpg"]["baud"])
     else:
-        tpg = tpg.TPG(device=config["tpg"]["device"])        
+        tpg = tpg.TPG(device=config["tpg"]["device"])
 
     while True:
-        # Get iwconfig
+        # Get iwconfig details
         iw_vars = get_iw()
-        # Read the ina219.
+        # Get the BME280 reading
+        bme_vars = get_bme280()
+        # Get the ina219 reading
         ina_vars = read_ina()
-        # get a reading from the tpg
+        # Get the tpg reading
         tpg_data = tpg.reading()
 
         # Make a chords variable dict to send to chords
         chords_record = make_chords_vars(tpg_data, new_keys)
-        # Add in iwconfig
+
+        # Add in other variables
         chords_record["vars"].update(iw_vars)
-        # Add in the ina variables
         chords_record["vars"].update(ina_vars)
+        chords_record["vars"].update(bme_vars)
+
         # Merge in the chords options
         chords_record.update(chords_options)
 
@@ -153,7 +179,7 @@ if __name__ == '__main__':
 
         # Flush the outputs
         sys.stdout.flush()
-        sys.stderr.flush() 
+        sys.stderr.flush()
 
         # Sleep until the next measurement time
         time.sleep(sleep_secs)
