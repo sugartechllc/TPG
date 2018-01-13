@@ -7,6 +7,9 @@ import Adafruit_BME280
 # pylint: disable=C0325
 
 class bme280(object):
+    """
+    Interface with an I2C connect BME280 sensor.
+    """
     def __init__(self):
         self.sensor = Adafruit_BME280.BME280(t_mode=Adafruit_BME280.BME280_OSAMPLE_8,
                                              p_mode=Adafruit_BME280.BME280_OSAMPLE_8,
@@ -24,6 +27,8 @@ class bme280(object):
         retval["temp_C"] = self.sensor.read_temperature()
         retval["pres_mb"] = self.sensor.read_pressure()/100
         retval["rh"] = self.sensor.read_humidity()
+
+        return retval
 
 if __name__ == '__main__':
     bme280 = bme280()
