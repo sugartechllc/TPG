@@ -57,7 +57,8 @@ def read_ina():
 
 def get_iw():
     """
-    Return iwconfig values that we want to send on to CHORDS
+    Return iwconfig values that we want to send on to CHORDS.
+    Possible returned hash values are "sig_dbm".
     """
     iw = iwconfig.iwconfig()
     iwvars = {}
