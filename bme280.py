@@ -1,14 +1,16 @@
 """
 BME280 (I2C) abstraction
 """
-from Adafruit_BME280 import *
+import Adafruit_BME280
 
 # pylint: disable=C0103
 # pylint: disable=C0325
 
 class bme280(object):
     def __init__(self):
-        self.sensor = BME280(t_mode=BME280_OSAMPLE_8, p_mode=BME280_OSAMPLE_8, h_mode=BME280_OSAMPLE_8)
+        self.sensor = Adafruit_BME280.BME280(t_mode=Adafruit_BME280.BME280_OSAMPLE_8,
+                                             p_mode=Adafruit_BME280.BME280_OSAMPLE_8,
+                                             h_mode=Adafruit_BME280.BME280_OSAMPLE_8)
 
     def reading(self):
         """
@@ -21,7 +23,7 @@ class bme280(object):
         retval = {}
         retval["temp_C"] = self.sensor.read_temperature()
         retval["pres_mb"] = self.sensor.read_pressure()/100
-        retval["rh"] = sensor.read_humidity()
+        retval["rh"] = self.sensor.read_humidity()
 
 if __name__ == '__main__':
     bme280 = bme280()
