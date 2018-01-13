@@ -8,6 +8,7 @@ from ina219 import INA219
 from ina219 import DeviceRangeError
 import tpg
 import pychords.tochords as tochords
+import iwconfig
 
 SHUNT_OHMS = 0.1
 MAX_EXPECTED_AMPS = 0.2
@@ -53,7 +54,17 @@ def read_ina():
         # Current out of device range with specified shunt resister
         print (e)
     return retval
- 
+
+def get_iw():
+    """
+    Return iwconfig values that we want to send on to CHORDS
+    """
+    iw = iwconfig.iwconfig()
+    iwvars = {}
+    if "sig_dbm" in iw.keys():
+        iwvars["sig_dbm"] = iw["sig_dbm"]
+    return iwvars
+
 if __name__ == '__main__':
 
     test_config = """
@@ -118,22 +129,30 @@ if __name__ == '__main__':
         tpg = tpg.TPG(device=config["tpg"]["device"])        
 
     while True:
+        # Get iwconfig
+        iw_vars = get_iw()
         # Read the ina219.
         ina_vars = read_ina()
         # get a reading from the tpg
         tpg_data = tpg.reading()
+
         # Make a chords variable dict to send to chords
         chords_record = make_chords_vars(tpg_data, new_keys)
+        # Add in iwconfig
+        chords_record["vars"].update(iw_vars)
         # Add in the ina variables
         chords_record["vars"].update(ina_vars)
         # Merge in the chords options
         chords_record.update(chords_options)
+
         # create the chords uri
         uri = tochords.buildURI(host, chords_record)
         # Send it to chords
         tochords.submitURI(uri, 720)
+
         # Flush the outputs
         sys.stdout.flush()
         sys.stderr.flush() 
+
         # Sleep until the next measurement time
         time.sleep(sleep_secs)

@@ -1,7 +1,7 @@
 """
 Access iwconfig command.
 """
-import os
+import subprocess
 import re
 
 def iwconfig(teststring=None):
@@ -25,10 +25,16 @@ def iwconfig(teststring=None):
     if teststring:
         lines = teststring
     else:
-        p = os.popen('/sbin/iwconfig', 'r')
-        lines = p.read()
+        lines = ''
+        process = subprocess.Popen('/sbin/iwconfig', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        while True:
+            line = process.stdout.read().decode('utf-8')
+            if line == '':
+                break
+            lines = lines + line
 
     lines = lines.split("\n")
+
     retval = {}
 
     # Create one long list of all of the tokens in the output
