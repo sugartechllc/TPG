@@ -24,7 +24,7 @@ class bme280(object):
            rh
         """
         retval = {}
-        retval["temp_C"] = "{:.2f}".format(self.sensor.read_temperature()))
+        retval["temp_C"] = "{:.2f}".format(self.sensor.read_temperature())
         retval["pres_mb"] = "{:.2f}".format(self.sensor.read_pressure()/100)
         retval["rh"] = "{:.2f}".format(self.sensor.read_humidity())
 
