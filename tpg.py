@@ -49,18 +49,18 @@ class TPG(object):
             if verbose:
                 print(l)
     
-    def meas(self):
+    def last(self):
         """
         Return {precip, rate, temperature}
         """
-        self.write('MEAS')
+        self.write('LAST')
         lines = self.readlines(firsttimeout=6)
         if verbose:
             print(lines)
         #
         # Valid returned lines (with blank lines removed):
         # [
-        #   'MEAS',
+        #   'LAST',
         #   'Reading',
         #   'Precip 0.0010 in',
         #   'Precip in bucket 0.6640 in',
@@ -73,7 +73,7 @@ class TPG(object):
         retval = {}
         if len(lines) != 7:
             return retval
-        if lines[0] != 'MEAS':
+        if lines[0] != 'LAST':
             return retval
 
         precip = lines[2].split(' ')
@@ -157,7 +157,7 @@ class TPG(object):
         retval = {}
 
         retval.update(self.time())
-        retval.update(self.meas())
+        retval.update(self.last())
         retval.update(self.batt())
         
         return retval
