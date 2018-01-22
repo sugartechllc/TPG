@@ -175,7 +175,7 @@ if __name__ == '__main__':
         # create the chords uri
         uri = tochords.buildURI(host, chords_record)
         # Send it to chords
-        tochords.submitURI(uri, 720)
+        tochords.submitURI(uri, 1440)
 
         # Flush the outputs
         sys.stdout.flush()
