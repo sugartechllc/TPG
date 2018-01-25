@@ -79,8 +79,12 @@ def read_ina():
     retval["busv_V"] = "{:.2f}".format(ina.voltage())
     try:
         retval["i_mA"] = "{:.2f}".format(ina.current())
-        retval["pwr_mW"] = "{:.2f}".format(ina.power())
-        retval["v_mV"] = "{:.2f}".format(ina.shunt_voltage())
+        net_pwr = ina.power()
+        shunt_v = ina.shunt_voltage()
+        if shunt_v > 0.0:
+            net_pwr = -net_pwr
+        retval["pwr_mW"] = "{:.2f}".format(net_pwr)
+        retval["v_mV"] = "{:.2f}".format(shunt_v)
     except DeviceRangeError as e:
         # Current out of device range with specified shunt resister
         print(e)
