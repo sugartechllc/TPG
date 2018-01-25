@@ -1,6 +1,8 @@
 # Total Precipitation Gauge
 ## Overview
-A python module for interacting with the Sutron Total Precipitation Gauge (TPG).
+A python module for interacting with the Sutron Total Precipitation Gauge (TPG). The
+tpgtochords module is provided, which will send tpg readings and other system
+health metrics to a [CHORDS portal](https://github.com/ncar/chords).
 
 The TPG onboard logger is configured and controlled by commands sent via the RS-232 port.
 
@@ -61,4 +63,17 @@ Battery 11.8V
 
 >
 ```
+
+## tpgtochords
+This module matches a custom data system buit around a Raspberry Pi Zero W, which performs the 
+following:
+ - Once per minute:
+   - Read the TPG measurement.
+   - Read pressure, temperature and humidity from a BME280 sensor.
+   - Read power information from an INA_219 sensor.
+   - Transmit to CHORDS.
+
+### INA_219
+ - Uses this [INA_219 package](https://github.com/chrisb2/pi_ina219).
+
 
