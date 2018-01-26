@@ -81,7 +81,7 @@ def read_ina():
         retval["i_mA"] = "{:.2f}".format(ina.current())
         net_pwr = ina.power()
         shunt_v = ina.shunt_voltage()
-        if shunt_v > 0.0:
+        if shunt_v < 0.0:
             net_pwr = -net_pwr
         retval["pwr_mW"] = "{:.2f}".format(net_pwr)
         retval["v_mV"] = "{:.2f}".format(shunt_v)
