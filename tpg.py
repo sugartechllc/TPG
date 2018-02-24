@@ -40,7 +40,9 @@ class TPG(object):
 
     def config(self):
         """
-        Configure the tpg for operation
+        Configure the tpg for operation.
+
+        NOT CURRENTLY IMPLEMENTED.
         """
         self.ser.reset_input_buffer()
         for l in ('', '', ''):
