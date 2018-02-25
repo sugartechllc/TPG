@@ -1,6 +1,9 @@
 #! /usr/local/bin/python3
 """
 Read a tpg data logger CSV file, and send to CHORDS.
+
+The CSV file is fetched from the Sutron TPG datalogger,
+using the LOG N command via minicom. 
 """
 
 # pylint: disable=C0103
