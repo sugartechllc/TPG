@@ -2,3 +2,4 @@
 __pycache__
 tpg-*.json
 .DS_Store
+csv-tpg-*.json
