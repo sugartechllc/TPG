@@ -111,7 +111,7 @@ def process(chords_options, tpgdata):
             # Send it to chords
             tochords.submitURI(uri, 1440)
             print(uri)
-            time.sleep(0.5)
+            time.sleep(0.25)
 
         else:
             print('Unknown sample:', sample)
