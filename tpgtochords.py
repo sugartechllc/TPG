@@ -25,7 +25,7 @@ ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
 try:
     ina.configure(ina.RANGE_16V)
 except OSError as e:
-    msg = "Unable to communicate with INA219: " + e
+    msg = "Unable to communicate with INA219: " + str(e)
     print(msg)
 
 # Create the BME280 device
@@ -92,7 +92,7 @@ def read_ina():
         retval["v_mV"] = "{:.2f}".format(shunt_v)
     except DeviceRangeError as e:
         # Current out of device range with specified shunt resister
-        print(e)
+        print("INA219 device out of range:" + str(e))
     return retval
 
 def get_iw():
@@ -161,12 +161,6 @@ if __name__ == '__main__':
         tpg = tpg.TPG(device=config["tpg"]["device"])
 
     while True:
-        # Get iwconfig details
-        iw_vars = get_iw()
-        # Get the BME280 reading
-        bme_vars = get_bme280()
-        # Get the ina219 reading
-        ina_vars = read_ina()
         # Get the tpg reading
         tpg_data = tpg.reading()
 
@@ -174,9 +168,22 @@ if __name__ == '__main__':
         chords_record = make_chords_vars(tpg_data, new_keys)
 
         # Add in other variables
+
+        # Get iwconfig details
+        iw_vars = get_iw()
         chords_record["vars"].update(iw_vars)
-        chords_record["vars"].update(ina_vars)
+
+        # Get the BME280 reading
+        bme_vars = get_bme280()
         chords_record["vars"].update(bme_vars)
+
+        # Get the ina219 reading
+        try:
+            ina_vars = read_ina()
+            chords_record["vars"].update(ina_vars)
+        except OSError as e:
+            msg = "Unable to get reading from INA219: " + str(e)
+            print (msg)
 
         # Merge in the chords options
         chords_record.update(chords_options)
