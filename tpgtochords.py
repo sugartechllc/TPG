@@ -20,8 +20,13 @@ SHUNT_OHMS = 0.1
 MAX_EXPECTED_AMPS = 0.2
 
 # Create and configure the ina219 device
+OSError
 ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
-ina.configure(ina.RANGE_16V)
+try:
+    ina.configure(ina.RANGE_16V)
+except OSError as e:
+    msg = "Unable to communicate with INA219: " + e
+    print(msg)
 
 # Create the BME280 device
 bme280 = bme280.bme280()
