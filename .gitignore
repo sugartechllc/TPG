@@ -2,4 +2,5 @@
 __pycache__
 tpg-*.json
 .DS_Store
+*Icon*
 csv-tpg-*.json
