@@ -145,8 +145,13 @@ if __name__ == '__main__':
     chords_options = {
         "inst_id": config["chords"]["inst_id"],
         "test": config["chords"]["test"],
-        "skey": config["chords"]["skey"]
     }
+    if "skey" in config["chords"]:
+        chords_options["skey"] = config["chords"]["skey"]
+    if ("api_email" in config["chords"]) and ("api_key" in config["chords"]):
+        chords_options["api_email"] = config["chords"]["api_email"]
+        chords_options["api_key"] = config["chords"]["api_key"]
+
     if "sleep_secs" in config["chords"]:
         sleep_secs = config["chords"]["sleep_secs"]
     else:
