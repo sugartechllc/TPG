@@ -76,4 +76,54 @@ following:
 ### INA_219
  - Uses this [INA_219 package](https://github.com/chrisb2/pi_ina219).
 
+## Annual Maintenance
+
+```sh
+    ssh tpg
+    sudo systemctl stop tpgtochords
+    minicom -D /dev/ttyUSB0
+```
+
+```sh
+# Enter the DIAG command to see what the current 
+# precip measurement is.
+>DIAG
+Resets total 0086
+        0072 powerup, 0000 monitor
+        0000 illegal,  0000 watchdog
+        0000 unimplem, 0012 upgrade
+        0000 unknown,  0002 soft
+
+
+Sensor: 1
+Precip: 33.1652
+Min:    33.1647
+Max:    33.1656
+StdDev: 0.0001
+Good:   8
+Total:  8
+mV:     9.6319
+   Type "DIAG 0" to clear counts
+```
+
+Perform the maintenance:
+
+   1. Remove cover
+   1. Empty the bucket
+   1. Clean the bucket
+   1. Add 1 gal. of Green antifreeze
+   1. Add 1 gal. of mineral oil
+   1. Replace cover
+
+Back to minicom:
+```sh
+# Set the precip measurement to the current value:
+PRECIP = 33.1652
+# Exit minicom:
+ctrl-A ctrl-Z
+
+sudo systemctl start tpgtochords
+journalctl -f -u tpgtochords
+```
+
 
