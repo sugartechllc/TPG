@@ -85,25 +85,17 @@ following:
 ```
 
 ```sh
-# Enter the DIAG command to see what the current 
+# Enter the MEAS command to see what the current 
 # precip measurement is.
->DIAG
-Resets total 0086
-        0072 powerup, 0000 monitor
-        0000 illegal,  0000 watchdog
-        0000 unimplem, 0012 upgrade
-        0000 unknown,  0002 soft
+>MEAS
+Reading
+        Precip 96.3228 in
+
+        Precip in bucket 33.1649 in
+        Field Cal Offset 63.1579132 ,   Precip Rate 0.0000 in/hour
 
 
-Sensor: 1
-Precip: 33.1652
-Min:    33.1647
-Max:    33.1656
-StdDev: 0.0001
-Good:   8
-Total:  8
-mV:     9.6319
-   Type "DIAG 0" to clear counts
+Temp In Box 11.80 C
 ```
 
 Perform the maintenance:
@@ -118,7 +110,7 @@ Perform the maintenance:
 Back to minicom:
 ```sh
 # Set the precip measurement to the current value:
-PRECIP = 33.1652
+PRECIP = 96.3228
 # Exit minicom:
 ctrl-A ctrl-Z
 
