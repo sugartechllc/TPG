@@ -112,7 +112,7 @@ Back to minicom:
 # Set the precip measurement to the current value:
 PRECIP = 96.3228
 # Exit minicom:
-ctrl-A ctrl-Z
+ctrl-A Z X
 
 sudo systemctl start tpgtochords
 journalctl -f -u tpgtochords
