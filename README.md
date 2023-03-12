@@ -110,7 +110,7 @@ Perform the maintenance:
 Back to minicom:
 ```sh
 # Set the precip measurement to the current value:
-PRECIP = 96.3228
+>PRECIP = 96.3228
 # Exit minicom:
 ctrl-A Z X
 
