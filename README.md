@@ -56,6 +56,11 @@ TIME
 System time 2017/12/28 22:45:33
 ```
 
+Set the time:
+```
+TIME 2017/12/28 22:45:33
+```
+
 ```
 BATT
 Battery 11.8V
