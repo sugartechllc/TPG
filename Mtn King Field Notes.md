@@ -1,5 +1,9 @@
 # Mtn King TPG Field Notes
 
+## 2024-03-30
+ - Annual maintenance: emptied, added 1 gal. antifreeze and 1 qt. mineral oil.
+ - Reset the clock. It was 4 miniutes fast.
+
 ## 2018-02-23
  - Rebooted the tpg pi, and got data flowing again.
  - Downloaded the February csv data from the TPG data logger.
