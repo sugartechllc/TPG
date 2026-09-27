@@ -83,11 +83,23 @@ following:
 
 ## Annual Maintenance
 
+Do this at least once a year, and before the bucket reading nears the configured bucket
+capacity. The gauge flags an error above 1.01 x the capacity, and `LAST` then appends
+"Error in reading" to the Precip line. Choose dry weather.
+
+**Two people are needed to empty a full bucket**, so that the load cell never takes a
+sideways or lifting load.
+
+### Before touching the bucket
+
 ```sh
     ssh tpg
     sudo systemctl stop tpgtochords
-    minicom -D /dev/ttyUSB0
+    minicom -D /dev/ttyUSB0 -b 115200
 ```
+
+Capture the state and keep a record of it: `MEAS` (three times), `DIAG`, `CERT`, `TIME`
+and `BATT`.
 
 ```sh
 # Enter the MEAS command to see what the current 
@@ -103,19 +115,73 @@ Reading
 Temp In Box 11.80 C
 ```
 
-Perform the maintenance:
+ - **Write down the Precip value (the running total) before emptying anything.** It is
+   the value to restore at the end. If the total is missing, take the last good value
+   from the data or the gauge log.
+ - `TIME` reports UTC. The clock drifts by about 2 minutes a month. If it is off by
+   more than a minute, set it with `TIME yyyy/mm/dd hh:mm:ss`.
+ - The gauge keeps only about 50 days of its own log. Download it with `LOG` (Ymodem
+   in minicom) if it is wanted.
+
+Look at the hardware before disturbing it. The plate must have a visible gap all round
+from the top of the data logger (a sheet of paper slides freely), the load cell bolts
+are snug (do not overtighten), the bubble level is centered, the cable is not pulled
+tight, and nothing touches the bucket or plate. A plate bearing on the logger makes
+part of any added weight bypass the load cell, giving a low and noisy reading.
+
+### Empty and clean
 
    1. Remove cover
-   1. Empty the bucket
-   1. Clean the bucket
-   1. Add 1 gal. of Green antifreeze
-   1. Add 1 gal. of mineral oil
+   1. Remove the liquid with the bucket in place (bailing cup or pump into a container).
+      Never slide, tilt, pour or lift a full bucket.
+   1. Lift out the nearly empty bucket straight up, pour out the rest, and dispose of the
+      antifreeze and oil properly (not on the ground)
+   1. Clean and dry the bucket
+   1. Put the bucket back flat on the plate, not on the alignment bumps, and wait 10 minutes
+
+### Check the calibration
+
+With the empty, dry bucket, `MEAS` three times: the reading should be about 0 in with the
+current calibration. Note it, since a change is a zero drift.
+
+Then check with known weights (1 in of precipitation = 0.8236 kg; see the calibration
+table in the TPG manual). Convert the mass in grams to inches by dividing by 823.6.
+
+   1. `MEAS` three times with no weights (N1)
+   1. Put the weights in the bucket, stacked and centered, wait 2 minutes, `MEAS` three
+      times (W)
+   1. Remove the weights, wait 2 minutes, `MEAS` three times (N2)
+
+The delta is mean(W) - mean(N1, N2), and should agree with the expected value within 0.1%.
+The readings within each set should agree to about 0.001 in.
+
+If the check fails, first look for problems with the mount (plate clearance, bolts, the
+bucket seating, how the weights sit) and repeat. Only recalibrate if it still fails on a
+sound mount. Use the `CAL` command as described in the TPG manual: empty dry bucket,
+wait 10 minutes, units `0` (in), the bucket capacity, and the known weight in inches
+(wait 2 minutes after placing it before pressing the key). The manual expects a slope of
+3.8 to 4.6 and an offset of -6.5 to -8.7 (inches). Then repeat the weight check. Any
+`CAL`, even an aborted one, resets the Field Cal Offset, so `PRECIP` must be set afterwards.
+
+### Refresh the antifreeze and mineral oil
+
+   1. Add the antifreeze first
+   1. Add the mineral oil on top, to stop evaporation (the manual suggests about 1/2 in of
+      oil, roughly 2 L)
    1. Replace cover
+
+The amount of antifreeze needed depends on the expected precipitation, since it is diluted
+as the bucket fills (see the freezing point tables in the manual). Wait 10 minutes for the
+reading to settle and `MEAS` once more.
+
+### Set the precip and restart
 
 Back to minicom:
 ```sh
-# Set the precip measurement to the current value:
+# Set the precip measurement to the value from before the service:
 >PRECIP = 96.3228
+# Check it:
+>MEAS
 # Exit minicom:
 ctrl-A Z X
 
@@ -123,4 +189,7 @@ sudo systemctl start tpgtochords
 journalctl -f -u tpgtochords
 ```
 
+Finally, confirm that data is arriving and that the total continues from the value that
+was set, and check the solar panel, cable glands and battery voltage (`BATT`) at the
+enclosure.
 
