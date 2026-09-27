@@ -1,8 +1,26 @@
 # Mtn King TPG Field Notes
 
+## 2024-11-23
+- Annual maintenance:
+  - Emptied bucket.
+  - Cleaned instrument.
+  - Added 1 gal. 50/50 green antifreeze.
+  - Add 1/4 gal. mineral oil.
+  - Reset PRECIP = 136.3346"
+
+
 ## 2024-03-30
  - Annual maintenance: emptied, added 1 gal. antifreeze and 1 qt. mineral oil.
  - Reset the clock. It was 4 miniutes fast.
+
+
+## 2023-03-11
+- Annual maintenance:
+  - Emptied bucket.
+  - Cleaned instrument.
+  - Added 1 gal. 50/50 green antifreeze.
+  - Add 3/4 gal. mineral oil.
+  - Reset PRECIP = 96.33"
 
 ## 2018-02-23
  - Rebooted the tpg pi, and got data flowing again.

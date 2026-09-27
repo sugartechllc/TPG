@@ -81,4 +81,46 @@ following:
 ### INA_219
  - Uses this [INA_219 package](https://github.com/chrisb2/pi_ina219).
 
+## Annual Maintenance
+
+```sh
+    ssh tpg
+    sudo systemctl stop tpgtochords
+    minicom -D /dev/ttyUSB0
+```
+
+```sh
+# Enter the MEAS command to see what the current 
+# precip measurement is.
+>MEAS
+Reading
+        Precip 96.3228 in
+
+        Precip in bucket 33.1649 in
+        Field Cal Offset 63.1579132 ,   Precip Rate 0.0000 in/hour
+
+
+Temp In Box 11.80 C
+```
+
+Perform the maintenance:
+
+   1. Remove cover
+   1. Empty the bucket
+   1. Clean the bucket
+   1. Add 1 gal. of Green antifreeze
+   1. Add 1 gal. of mineral oil
+   1. Replace cover
+
+Back to minicom:
+```sh
+# Set the precip measurement to the current value:
+>PRECIP = 96.3228
+# Exit minicom:
+ctrl-A Z X
+
+sudo systemctl start tpgtochords
+journalctl -f -u tpgtochords
+```
+
 
