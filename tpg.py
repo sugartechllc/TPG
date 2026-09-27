@@ -6,6 +6,7 @@ TPG abstraction
 # pylint: disable=C0103
 # pylint: disable=C0325
 
+import re
 import sys
 import argparse
 import serial
@@ -53,7 +54,8 @@ class TPG(object):
     
     def last(self):
         """
-        Return {precip, rate, temperature}
+        Return {precip, bucket, rate, temperature}, plus error if the
+        tpg reported one.
         """
         self.write('LAST')
         lines = self.readlines(firsttimeout=6)
@@ -71,28 +73,45 @@ class TPG(object):
         #   '>'
         # ]
         #
+        # When the tpg flags a problem (for example the bucket is over its
+        # capacity), error text is appended to the Precip line, and there may
+        # be additional error lines:
+        # [
+        #   'LAST',
+        #   'Last Reading',
+        #   'Precip 68.6833 in, Error in reading',
+        #   'Precip in bucket 36.5498 in',
+        #   ...
+        # ]
+        # The values are still valid, so find the lines by content rather
+        # than position, and pass any error text back as "error".
+        #
 
         retval = {}
-        if len(lines) != 7:
-            return retval
-        if lines[0] != 'LAST':
+        if not lines or lines[0] != 'LAST':
             return retval
 
-        precip = lines[2].split(' ')
-        if len(precip) == 3:
-            retval["precip"] = precip[1]
+        errors = []
+        for l in lines[1:]:
+            precip = re.match(r'Precip (\S+) \S+(?:, (.*))?$', l)
+            bucket = re.match(r'Precip in bucket (\S+) \S+$', l)
+            rate = re.search(r'Precip Rate (\S+) \S+$', l)
+            temperature = re.match(r'Temp In Box (\S+) \S+$', l)
+            if bucket:
+                retval["bucket"] = bucket.group(1)
+            elif precip:
+                retval["precip"] = precip.group(1)
+                if precip.group(2):
+                    errors.append(precip.group(2))
+            elif rate:
+                retval["rate"] = rate.group(1)
+            elif temperature:
+                retval["temperature"] = temperature.group(1)
+            elif l not in ('Reading', 'Last Reading', '>'):
+                errors.append(l)
 
-        bucket = lines[3].split(' ')
-        if len(bucket) == 5:
-            retval["bucket"] = bucket[3]
-
-        rate = lines[4].split(' ')
-        if len(rate) == 9:
-            retval["rate"] = rate[7]
-
-        temperature = lines[5].split(' ')
-        if len(temperature) == 5:
-            retval["temperature"] = temperature[3]
+        if errors:
+            retval["error"] = '; '.join(errors)
 
         return retval
 
